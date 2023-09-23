@@ -9,8 +9,7 @@ from main.models import Product
 from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages  
-from django.contrib.auth import authenticate, login
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
@@ -19,7 +18,8 @@ def show_main(request):
     products = Product.objects.filter(user=request.user)
 
     context = {
-        'name': request.user.username, # Nama kamu
+        'name': request.user.username,
+        'class' : 'PBP D',
         'products': products,
         'last_login': request.COOKIES.get('last_login')
     }
@@ -58,6 +58,7 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
+
             messages.success(request, 'Your account has been successfully created!')
             return redirect('main:login')
 
@@ -68,7 +69,10 @@ def login_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+    
         user = authenticate(request, username=username, passsword=password)
+        print(username)
+        print(password)
         if user is not None:
             login(request, user)
             response = HttpResponseRedirect(reverse("main:show_main")) 

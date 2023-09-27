@@ -11,6 +11,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages  
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 # Create your views here.
 @login_required(login_url='/login')
@@ -27,13 +28,17 @@ def show_main(request):
     return render(request, "main.html", context)
 
 def create_product(request):
- form = ProductForm(request.POST or None)
+    form = ProductForm(request.POST or None)
 
- if form.is_valid() and request.method == "POST":
-     product = form.save(commit=False)
-     product.user = request.user
-     product.save()
-     return HttpResponseRedirect(reverse('main:show_main'))
+    if form.is_valid() and request.method == "POST":
+        product = form.save(commit=False)
+        product.user = request.user
+        product.save()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    context = {'form': form}
+    return render(request, "create_product.html", context)
+
  
 
 def show_xml(request):
@@ -70,7 +75,7 @@ def login_user(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
     
-        user = authenticate(request, username=username, passsword=password)
+        user = authenticate(request, username=username, password=password)
         print(username)
         print(password)
         if user is not None:
@@ -88,3 +93,26 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse('main:login'))
     response.delete_cookie('last_login')
     return response
+
+def edit_product(request, id):
+    # Get product berdasarkan ID
+    product = Product.objects.get(pk = id)
+
+    # Set product sebagai instance dari form
+    form = ProductForm(request.POST or None, instance=product)
+
+    if form.is_valid() and request.method == "POST":
+        # Simpan form dan kembali ke halaman awal
+        form.save()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    context = {'form': form}
+    return render(request, "edit_product.html", context)
+
+def delete_product(request, id):
+    # Get data berdasarkan ID
+    product = Product.objects.get(pk = id)
+    # Hapus data
+    product.delete()
+    # Kembali ke halaman awal
+    return HttpResponseRedirect(reverse('main:show_main'))

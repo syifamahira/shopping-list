@@ -46,14 +46,6 @@
         </button>
     </a>
 
-    <h5>Sesi terakhir login: {{ last_login }}</h5>
-    
-    <a href="{% url 'main:logout' %}">
-        <button>
-            Logout
-        </button>
-    </a>
-
     <script>
       async function getProducts() {
           return fetch("{% url 'main:get_product_json' %}").then((res) => res.json())
@@ -128,6 +120,15 @@
 </div>
 
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Product by AJAX</button>
+
+    <h5>Sesi terakhir login: {{ last_login }}</h5>
+    
+    <a href="{% url 'main:logout' %}">
+        <button>
+            Logout
+        </button>
+    </a>
+
 
 {% endblock content %}
 
